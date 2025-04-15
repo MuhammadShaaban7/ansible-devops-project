@@ -1,0 +1,25 @@
+---
+- name: Deploy Docker Container with Ansible
+  hosts: localhost
+  tasks:
+    - name: Ensure Docker is installed
+      apt:
+        name: docker.io
+        state: present
+      become: yes
+
+    - name: Ensure Docker service is running
+      service:
+        name: docker
+        state: started
+        enabled: yes
+      become: yes
+
+    - name: Build Docker image
+      command: docker build -t ansible-devops-app .
+      args:
+        chdir: "{{ playbook_dir }}/.."
+
+    - name: Run Docker container
+      command: docker run -d -p 3000:3000 --name ansible-devops-container ansible-devops-app
+      ignore_errors: yes
